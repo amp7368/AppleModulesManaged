@@ -4,7 +4,7 @@ plugins {
     id 'java'
     id 'maven-publish'
 }
-//apply from: 'private-build.gradle'
+
 allprojects { p ->
     group groupValue
     version versionValue
@@ -35,5 +35,5 @@ test {
     useJUnitPlatform()
 }
 shadowJar {
-
+    classifier('')
 }
