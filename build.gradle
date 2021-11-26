@@ -1,0 +1,39 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java-library'
+    id 'java'
+    id 'maven-publish'
+}
+//apply from: 'private-build.gradle'
+allprojects { p ->
+    group groupValue
+    version versionValue
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compileOnly 'com.github.amp7368:AppleUtilities:v1.1'
+}
+publishing {
+    publications {
+        fullPublication(MavenPublication) {
+            artifact shadowJar
+            pom {
+                group = project.group
+                version = project.version
+                name = project.name
+            }
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+shadowJar {
+
+}
