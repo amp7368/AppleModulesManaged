@@ -1,39 +1,63 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'java-library'
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'maven-publish'
 }
 
-allprojects { p ->
-    group groupValue
-    version versionValue
-}
-
 repositories {
+    maven { url "https://reposilite.appleptr16.com/appleptr16" }
     mavenCentral()
-    maven { url "https://jitpack.io" }
+}
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
-dependencies {
-    compileOnly 'com.github.amp7368:AppleUtilities:v1.1'
-}
+project.group groupValue
+project.version versionValue
 publishing {
+    repositories {
+        maven {
+            name 'appleptr16Repo'
+            url 'https://reposilite.appleptr16.com/appleptr16'
+            credentials(PasswordCredentials)
+        }
+    }
     publications {
-        fullPublication(MavenPublication) {
-            artifact shadowJar
-            pom {
-                group = project.group
-                version = project.version
-                name = project.name
+        shadow(MavenPublication) { publication ->
+            {
+                publication.artifactId(project.name.toLowerCase())
+                project.shadow.component(publication)
             }
         }
     }
 }
-
-test {
-    useJUnitPlatform()
+tasks.register('publishToAppleptr16') {
+    dependsOn(shadowJar, publishAllPublicationsToAppleptr16RepoRepository)
 }
+configurations {
+    configureEach {
+        resolutionStrategy.cacheDynamicVersionsFor 1, 'seconds'
+        resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
+    }
+}
+
+dependencies {
+    implementation 'io.yml:YmlFileManager:3.1-SNAPSHOT'
+    compileOnly 'apple.utilities:AppleUtilities:1.3-SNAPSHOT'
+
+    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+}
+
 shadowJar {
-    classifier('')
+    outputs.upToDateWhen {
+        false
+    }
+    classifier ''
+    group project.group
+    version project.version
 }
